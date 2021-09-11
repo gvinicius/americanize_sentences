@@ -1,3 +1,15 @@
+use std::env;
+
+pub mod conversion;
+
+use crate::{error, error::Error::*, DBCon, DBPool};
+use mobc::Pool;
+use mobc_postgres::{tokio_postgres, PgConnectionManager};
+use std::fs;
+use std::str::FromStr;
+use std::time::Duration;
+use tokio_postgres::{Config, Error, NoTls};
+
 type Result<T> = std::result::Result<T, error::Error>;
 
 const DB_POOL_MAX_OPEN: u64 = 32;
@@ -19,12 +31,12 @@ pub async fn get_db_con(db_pool: &DBPool) -> Result<DBCon> {
 }
 
 pub fn create_pool() -> std::result::Result<DBPool, mobc::Error<Error>> {
-    let host = env::var("PGHOST")
-    let user = env::var("PGUSER")
-    let psw = env::var("PGPASS")
-    let dbname = env::var("PGDBNAME")
-    let address = user + "://" + psw + "@" + host + "5432" + "/" + dbname
-    let config = Config::from_str(address)?;
+    let host = env::var("PGHOST")    .unwrap();
+    let user = env::var("PGUSER")    .unwrap();
+    let psw = env::var("PGPASS")     .unwrap();
+    let dbname = env::var("PGDBNAME").unwrap();
+    let address = format!("{}{}{}{}{}{}{}{}{}", "postgresql://", user, ":", psw, "@", host, ":5432", "/", dbname);
+    let config = Config::from_str(&address)?;
 
     let manager = PgConnectionManager::new(config, NoTls);
     Ok(Pool::builder()

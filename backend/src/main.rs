@@ -1,6 +1,17 @@
+use mobc::{Connection, Pool};
+use mobc_postgres::{tokio_postgres, PgConnectionManager};
+use std::convert::Infallible;
+use tokio_postgres::NoTls;
+use warp::{
+    http::{header, Method},
+    Filter, Rejection,
+};
+
 mod db;
 mod error;
 mod handler;
+#[cfg(test)]
+mod tests;
 
 type Result<T> = std::result::Result<T, Rejection>;
 type DBCon = Connection<PgConnectionManager<NoTls>>;
@@ -14,23 +25,7 @@ async fn main() {
         .await
         .expect("database can be initialized");
 
-    let pet = warp::path!("conversion" / i32 / "pet");
-    let pet_param = warp::path!("conversion" / i32 / "pet" / i32);
     let conversion = warp::path("conversion");
-
-    let pet_routes = pet
-        .and(warp::get())
-        .and(with_db(db_pool.clone()))
-        .and_then(handler::list_pets_handler)
-        .or(pet
-            .and(warp::post())
-            .and(warp::body::json())
-            .and(with_db(db_pool.clone()))
-            .and_then(handler::create_pet_handler))
-        .or(pet_param
-            .and(warp::delete())
-            .and(with_db(db_pool.clone()))
-            .and_then(handler::delete_pet_handler));
 
     let conversion_routes = conversion
         .and(warp::get())
@@ -46,6 +41,8 @@ async fn main() {
             .and(warp::body::json())
             .and(with_db(db_pool.clone()))
             .and_then(handler::create_conversion_handler));
+
+    let routes = conversion_routes.recover(error::handle_rejection);
 
     warp::serve(routes).run(([127, 0, 0, 1], 8000)).await;
 }

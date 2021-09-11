@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 pub struct Conversion {
     pub id: i32,
     pub name: String,
-    pub formula: String,
+    pub formula: String
 }
 
 #[derive(Deserialize, Clone, PartialEq, Debug)]
@@ -13,12 +13,19 @@ pub struct ConversionRequest {
     pub name: String
 }
 
-impl OwnerResponse {
-    pub fn of(owner: Owner) -> OwnerResponse {
-        OwnerResponse {
-            id: owner.id,
-            name: owner.name,
-            formula: owner.formula,
+#[derive(Serialize, Deserialize, Clone, PartialEq, Debug)]
+pub struct ConversionResponse {
+    pub id: i32,
+    pub name: String,
+    pub formula: String
+}
+
+impl ConversionResponse {
+    pub fn of(conversion: Conversion) -> ConversionResponse {
+        ConversionResponse {
+            id: conversion.id,
+            name: conversion.name,
+            formula: conversion.formula,
         }
     }
 }
