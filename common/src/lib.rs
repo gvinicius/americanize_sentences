@@ -1,4 +1,4 @@
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Deserializer, Serialize};
 
 #[derive(Deserialize, Clone, PartialEq, Debug)]
 pub struct Conversion {
@@ -9,7 +9,6 @@ pub struct Conversion {
 
 #[derive(Deserialize, Clone, PartialEq, Debug)]
 pub struct ConversionRequest {
-    pub id: i32,
     pub name: String
 }
 

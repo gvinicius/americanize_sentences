@@ -10,8 +10,6 @@ use warp::{
 mod db;
 mod error;
 mod handler;
-#[cfg(test)]
-mod tests;
 
 type Result<T> = std::result::Result<T, Rejection>;
 type DBCon = Connection<PgConnectionManager<NoTls>>;
